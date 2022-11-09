@@ -2,8 +2,9 @@ import { Text, View, Button, Alert, Modal, StyleSheet, Pressable } from 'react-n
 import Slider from '@react-native-community/slider';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Bar } from './interfaces/Bar'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePostHog } from 'posthog-react-native';
+import { GetRatio } from './helpers/GetRatio'
 
 interface BarViewProps {
   closeModal: Function,
@@ -15,9 +16,25 @@ interface BarViewProps {
 
 export const BarView = (props:BarViewProps) => {
   const [reportGenderRatio, setReportGenderRatio] = useState(50);
+  const [reportGenderRatioLabel, setReportGenderRatioLabel] = useState("");
   const [reportLitLevel, setReportLitLevel] = useState(5)
   const [ showVibeReport, setShowVibeReport ] = useState(false)
+  const [genderRatio, setGenderRatio ] = useState("")
   const posthog = usePostHog()
+
+  useEffect(()=>{
+    handleRatio(props.male)
+    handleReportRatio(50)
+  }, [])
+
+  const handleRatio = (male: any) => {
+    setGenderRatio(GetRatio(male, 100-male))
+  }
+
+  const handleReportRatio = (male: any) => {
+    setReportGenderRatioLabel(GetRatio(male, 100-male))
+  }
+  
 
 
   return (
@@ -40,7 +57,7 @@ export const BarView = (props:BarViewProps) => {
             <View style={{flex: 2, flexDirection: "row", marginBottom: 10, marginHorizontal: "auto", maxHeight:120, marginTop: 20}} >
               <View style={{ alignItems: 'center', }}>
                 <Text style={{ fontSize: 40 }}>🔥</Text>
-                <Text style={{ fontSize: 18, color:'orange' }}>8/10</Text>
+                <Text style={{ fontSize: 18, color:'orange' }}>{props.bar.litLevel}/10</Text>
                 <Text style={{ fontSize: 18, color:'grey' }}>Lit level</Text>
               </View>
               <View style={{marginLeft:30, marginBottom:10}}>
@@ -55,10 +72,14 @@ export const BarView = (props:BarViewProps) => {
                     minimumTrackTintColor="#307ecc"
                     maximumTrackTintColor="#be2596"
                     step={1}
-                    value={reportLitLevel}
+                    value={props.bar.males}
+                    onValueChange={(value) => {
+                      handleRatio(value)
+                    }}
+                    disabled={true}
                   />
                   <View style={{alignItems:'center'}}>
-                    <Text style={{ fontSize: 18, color:'blue' }}>1:1</Text>
+                    <Text style={{ fontSize: 18, color:'blue' }}>{genderRatio}</Text>
                     <Text style={{ fontSize: 18, color:'grey' }}>Ratio</Text>
                   </View>
                 </View>
@@ -88,7 +109,7 @@ export const BarView = (props:BarViewProps) => {
               </Pressable>
             </View>
           </View>
-          <View style={{flex: 2, flexDirection: "column", marginBottom: 10, marginHorizontal: "auto",}} >
+          <View style={{flex: 2, flexDirection: "column", marginHorizontal: "auto",}} >
             <View style={{ alignItems: 'center' }}>
             <View style={{ alignItems: 'center', }}>
               
@@ -122,7 +143,8 @@ export const BarView = (props:BarViewProps) => {
                 </View>
                 <View
                   style={{
-                    marginTop: -15
+                    marginTop: -15,
+                    marginBottom: 20
                   }}>
                   <Slider
                     style={{width: 250, height: 40}}
@@ -131,10 +153,15 @@ export const BarView = (props:BarViewProps) => {
                     minimumTrackTintColor="#307ecc"
                     maximumTrackTintColor="#be2596"
                     step={1}
+                    onValueChange= { (value)=> {
+                      console.log("value: " + value)
+                      handleReportRatio(value)
+                      }
+                    }
                     value={reportGenderRatio}
                   />
                   <View style={{alignItems:'center'}}>
-                    <Text style={{ fontSize: 18, color:'blue' }}>1:1</Text>
+                    <Text style={{ fontSize: 18, color:'blue' }}>{reportGenderRatioLabel}</Text>
                     <Text style={{ fontSize: 18, color:'grey' }}>Ratio</Text>
                   </View>
                 </View>
@@ -142,10 +169,11 @@ export const BarView = (props:BarViewProps) => {
               </View>
             <Pressable
               onPress={()=>{
-                setShowVibeReport(true)
+                setShowVibeReport(false)
+                props.closeModal()
                 posthog?.capture("Vibe report submitted", { status: "successful" })
               }}
-              style={[styles.button, styles.buttonClose]}
+              style={[styles.button, styles.buttonClose, {marginBottom: 30 }] }
             >
               <Text style={[styles.textStyle, { fontFamily: 'Factor-A-Medium', fontSize:18, padding:4 }]}>Submit</Text>
             </Pressable>
@@ -172,7 +200,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 500
+    marginTop: 450,
   },
   modalView: {
     margin: 5,

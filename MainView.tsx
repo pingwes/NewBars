@@ -47,13 +47,11 @@ export const MainView = () => {
 
   const pickBar = (bar: Bar) => {
     posthog?.capture("Bar selected", { status: "successful" })
-    console.log("bar picked")
     setBarModalVisible(true)
     setBar(bar)
   }
 
-  const closeModal = () =>{    
-    console.log("yoo")
+  const closeModal = () => {    
     setBarModalVisible(false)
   }
 
