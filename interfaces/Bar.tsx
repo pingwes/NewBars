@@ -9,4 +9,6 @@ export interface Bar {
   litLevel?: number
   males?: number
   females?: number
+  cover?: number
+  lastUpdate?: string
 }

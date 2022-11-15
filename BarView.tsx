@@ -9,9 +9,6 @@ import { GetRatio } from './helpers/GetRatio'
 interface BarViewProps {
   closeModal: Function,
   bar: Bar,
-  litLevel: number
-  male: number
-  female: number
 }
 
 export const BarView = (props:BarViewProps) => {
@@ -23,7 +20,7 @@ export const BarView = (props:BarViewProps) => {
   const posthog = usePostHog()
 
   useEffect(()=>{
-    handleRatio(props.male)
+    handleRatio(props.bar.males)
     handleReportRatio(50)
   }, [])
 
@@ -36,23 +33,16 @@ export const BarView = (props:BarViewProps) => {
   }
   
 
-
   return (
     
-    <View style={styles.centeredView}>
+    <View style={[styles.centeredView, {marginTop: showVibeReport ? 330 : 400}]}>
         <View style={styles.modalView}>
         { !showVibeReport && (
           <>
-            <View style={{flexDirection: "row", height:50, alignItems:"stretch", width:'100%'}}>
+            <View style={{ height:77, alignItems:"stretch", width:'100%'}}>
               <Text style={{ flex:6, fontFamily: 'Factor-A-Medium', fontSize: 25, }}>{props.bar.name}</Text>
-              <View style={{ flex:1, flexDirection:"row-reverse"}}>
-                <Pressable
-                  onPress={()=>{
-                    props.closeModal()
-                  }}>
-                  <Ionicons name="md-close" size={32} color="gray" style={{ alignItems:"stretch", }} />
-                </Pressable>
-              </View>
+            <Text style={{ fontFamily: 'Factor-A-Medium', fontSize: 13, color:'grey', marginBottom:7 }}>Last updated: {props.bar.lastUpdate}</Text>
+            <Text style={{ fontFamily: 'Factor-A-Medium', fontSize: 20, color:'green' }}>Cover: ${props.bar.cover}</Text>
             </View>
             <View style={{flex: 2, flexDirection: "row", marginBottom: 10, marginHorizontal: "auto", maxHeight:120, marginTop: 20}} >
               <View style={{ alignItems: 'center', }}>
@@ -79,7 +69,7 @@ export const BarView = (props:BarViewProps) => {
                     disabled={true}
                   />
                   <View style={{alignItems:'center'}}>
-                    <Text style={{ fontSize: 18, color:'blue' }}>{genderRatio}</Text>
+                    <Text style={{ fontSize: 18, color:'#9b3af0' }}>{genderRatio}</Text>
                     <Text style={{ fontSize: 18, color:'grey' }}>Ratio</Text>
                   </View>
                 </View>
@@ -94,25 +84,32 @@ export const BarView = (props:BarViewProps) => {
             >
               <Text style={[styles.textStyle, { fontFamily: 'Factor-A-Medium', fontSize:18, padding:4 }]}>Report Vibe</Text>
             </Pressable>
+            <Pressable
+              onPress={()=>{
+                props.closeModal()
+              }}
+              style={[styles.button, styles.buttonNeutral]}
+            >
+              <Text style={[styles.textStyle, { fontFamily: 'Factor-A-Medium', fontSize:18, padding:4 }]}>Close</Text>
+            </Pressable>
           </>
         )}
         { showVibeReport && (
           <>
-            <View style={{flexDirection: "row", height:50, alignItems:"stretch", width:'100%'}}>
+            <View style={{flexDirection: "row", height:60, alignItems:"stretch", width:'100%'}}>
             <Text style={{ flex:6, fontFamily: 'Factor-A-Medium', fontSize: 25, }}>Submit Vibe Report</Text>
             <View style={{ flex:1, flexDirection:"row-reverse"}}>
-              <Pressable
+              {/* <Pressable
                 onPress={()=>{
                   props.closeModal()
                 }}>
                 <Ionicons name="md-close" size={32} color="gray" style={{ alignItems:"stretch", }} />
-              </Pressable>
+              </Pressable> */}
             </View>
           </View>
           <View style={{flex: 2, flexDirection: "column", marginHorizontal: "auto",}} >
             <View style={{ alignItems: 'center' }}>
-            <View style={{ alignItems: 'center', }}>
-              
+              <View style={{ alignItems: 'center', }}>
                 <Text style={{ fontSize: 40 }}>🔥</Text>
                 <Slider
                   style={{width: 250, height: 40}}
@@ -127,10 +124,8 @@ export const BarView = (props:BarViewProps) => {
                 />
                 <Text style={{ fontSize: 18, color:'orange' }}>{reportLitLevel}/10</Text>
                 <Text style={{ fontSize: 18, color:'grey' }}>Lit level</Text>
-                
               </View>
-            
-              <View style={{marginTop:30}}>
+              <View style={{marginTop:20}}>
                 <View style={{
                     flex: 2, 
                     flexDirection: "row", 
@@ -154,14 +149,13 @@ export const BarView = (props:BarViewProps) => {
                     maximumTrackTintColor="#be2596"
                     step={1}
                     onValueChange= { (value)=> {
-                      console.log("value: " + value)
                       handleReportRatio(value)
                       }
                     }
                     value={reportGenderRatio}
                   />
                   <View style={{alignItems:'center'}}>
-                    <Text style={{ fontSize: 18, color:'blue' }}>{reportGenderRatioLabel}</Text>
+                    <Text style={{ fontSize: 18, color:'#9b3af0' }}>{reportGenderRatioLabel}</Text>
                     <Text style={{ fontSize: 18, color:'grey' }}>Ratio</Text>
                   </View>
                 </View>
@@ -173,9 +167,17 @@ export const BarView = (props:BarViewProps) => {
                 props.closeModal()
                 posthog?.capture("Vibe report submitted", { status: "successful" })
               }}
-              style={[styles.button, styles.buttonClose, {marginBottom: 30 }] }
+              style={[styles.button, styles.buttonClose, {marginBottom: 10 }] }
             >
               <Text style={[styles.textStyle, { fontFamily: 'Factor-A-Medium', fontSize:18, padding:4 }]}>Submit</Text>
+            </Pressable>
+            <Pressable
+              onPress={()=>{
+                setShowVibeReport(false)
+              }}
+              style={[styles.button, styles.buttonNeutral]}
+            >
+              <Text style={[styles.textStyle, { fontFamily: 'Factor-A-Medium', fontSize:18, padding:4 }]}>Cancel</Text>
             </Pressable>
           </View>
         </>
@@ -200,14 +202,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 450,
+    marginTop: 300,
   },
   modalView: {
     margin: 5,
     
     backgroundColor: "white",
     fontSize:20,
-    borderRadius: 20,
+    borderRadius: 0,
     padding: 35,
     shadowColor: "#000",
     shadowOffset: {
@@ -219,7 +221,7 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   button: {
-    borderRadius: 20,
+    borderRadius: 0,
     padding: 10,
     elevation: 2,
     margin: 5
@@ -229,6 +231,9 @@ const styles = StyleSheet.create({
   },
   buttonClose: {
     backgroundColor: "#2196F3",
+  },
+  buttonNeutral:{
+    backgroundColor: "#ada6ad",
   },
   textStyle: {
     color: "white",

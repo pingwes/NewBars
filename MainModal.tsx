@@ -13,9 +13,6 @@ interface MainModalProps {
 
 export const MainModal = (props: MainModalProps) => {
   
-  const [ startReportVibe, setStartReportVibe] = useState(false)
- 
-
   return (
     <Modal
         animationType="slide"
@@ -29,69 +26,9 @@ export const MainModal = (props: MainModalProps) => {
         <BarView 
           closeModal={props.closeModal} 
           bar={props.bar}
-          litLevel={10}
-          male={50}
-          female={50}
+
         />
       )}
     </Modal>
-
   )
 }
-
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 500
-  },
-  modalView: {
-    margin: 5,    
-    backgroundColor: "white",
-    fontSize:20,
-    borderRadius: 20,
-    padding: 35,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-    margin: 5
-  },
-  buttonOpen: {
-    backgroundColor: "#F194FF",
-  },
-  buttonClose: {
-    backgroundColor: "#2196F3",
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center"
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-    marginTop: 10,
-  }
-});
