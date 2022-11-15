@@ -165,7 +165,7 @@ export const BarView = (props:BarViewProps) => {
               onPress={()=>{
                 setShowVibeReport(false)
                 props.closeModal()
-                posthog?.capture("Vibe report submitted", { status: "successful" })
+                posthog?.capture("Vibe report submitted", { status: "successful", litLevel: reportLitLevel, genderRatio: reportGenderRatioLabel })
               }}
               style={[styles.button, styles.buttonClose, {marginBottom: 10 }] }
             >
